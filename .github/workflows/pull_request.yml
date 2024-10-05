@@ -2,7 +2,7 @@ name: Run Tests
 
 on:
   pull_request:
-    branches: [master]
+    branches: [ master ]
 
 jobs:
   build:
@@ -23,3 +23,20 @@ jobs:
 
       - name: Run unit tests
         run: ./gradlew clean testDebug
+
+      - name: Assemble Release Bundle
+        run: ./gradlew bundleRelease
+
+      - name: Sign Release
+        uses: r0adkll/sign-android-release@v1
+        with:
+          releaseDirectory: app/build/outputs/bundle/release
+          signingKeyBase64: ${{ secrets.ANDROID_KEYSTORE }}
+          keyStorePassword: ${{ secrets.KEYSTORE_PASSWORD }}
+          alias: ${{ secrets.KEY_ALIAS }}
+          keyPassword: ${{ secrets.KEY_PASSWORD }}
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: my-artifact
+          path: app/build/outputs/bundle/release/app-release.aab
