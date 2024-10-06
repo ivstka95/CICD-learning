@@ -24,19 +24,24 @@ jobs:
       - name: Run unit tests
         run: ./gradlew clean testDebug
 
-      - name: Assemble Release Bundle
-        run: ./gradlew assembleRelease
+      - name: Decode Keystore
+          env:
+            ENCODED_STRING: ${{ secrets.SIGNING_KEY_STORE_BASE64 }}
+            SIGNING_KEY_STORE_PATH: ${{ secrets.SIGNING_KEY_STORE_PATH }}
 
-      - name: Sign Release
-        uses: r0adkll/sign-android-release@v1
-        with:
-          releaseDirectory: app/build/outputs/apk/release
-          signingKeyBase64: ${{ secrets.ANDROID_KEYSTORE }}
-          keyStorePassword: ${{ secrets.KEYSTORE_PASSWORD }}
-          alias: ${{ secrets.KEY_ALIAS }}
-          keyPassword: ${{ secrets.KEY_PASSWORD }}
+          run: |
+            echo $ENCODED_STRING > keystore-b64.txt
+            base64 -d keystore-b64.txt > $SIGNING_KEY_STORE_PATH
+
+      - name: Build Release apk
+          env:
+            SIGNING_KEY_STORE_PATH: ${{ secrets.SIGNING_KEY_STORE_PATH }}
+            SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
+            SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+            SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
+          run: ./gradlew assembleRelease
 
       - uses: actions/upload-artifact@v4
         with:
           name: my-artifact
-          path: app/build/outputs/apk/release/app-release-unsigned.apk
+          path: app/build/outputs/apk/release/app-release.apk
