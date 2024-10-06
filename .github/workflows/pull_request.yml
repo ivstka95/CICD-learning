@@ -25,21 +25,21 @@ jobs:
         run: ./gradlew clean testDebug
 
       - name: Decode Keystore
-          env:
-            ENCODED_STRING: ${{ secrets.SIGNING_KEY_STORE_BASE64 }}
-            SIGNING_KEY_STORE_PATH: ${{ secrets.SIGNING_KEY_STORE_PATH }}
+        env:
+          ENCODED_STRING: ${{ secrets.ANDROID_KEYSTORE }}
+          SIGNING_KEY_STORE_PATH: ${{ secrets.SIGNING_KEY_STORE_PATH }}
 
-          run: |
+        run: |
             echo $ENCODED_STRING > keystore-b64.txt
             base64 -d keystore-b64.txt > $SIGNING_KEY_STORE_PATH
 
       - name: Build Release apk
-          env:
-            SIGNING_KEY_STORE_PATH: ${{ secrets.SIGNING_KEY_STORE_PATH }}
-            SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
-            SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
-            SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
-          run: ./gradlew assembleRelease
+        env:
+          SIGNING_KEY_STORE_PATH: ${{ secrets.SIGNING_KEY_STORE_PATH }}
+          SIGNING_KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          SIGNING_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          SIGNING_STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        run: ./gradlew assembleRelease
 
       - uses: actions/upload-artifact@v4
         with:
