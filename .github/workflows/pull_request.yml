@@ -25,7 +25,7 @@ jobs:
         run: ./gradlew clean testDebug
 
   build:
-    name: Distribute bundle to Google Play
+    name: Provide apk
     needs: test
     runs-on: ubuntu-latest
 
