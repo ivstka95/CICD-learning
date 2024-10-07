@@ -47,7 +47,7 @@ jobs:
 
         run: |
           echo $ENCODED_STRING > keystore-b64.txt
-          base64 -d keystore-b64.txt > /app/keystore.jks
+          base64 -d keystore-b64.txt > $KEYSTORE_FILE
           pwd
           ls -l
 
