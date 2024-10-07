@@ -20,13 +20,16 @@ android {
         }
     }
     signingConfigs {
+
         create("release") {
             println(rootDir)
             println("KEYSTORE_FILE = " + System.getenv("KEYSTORE_FILE"))
             println("SIGNING_STORE_PASSWORD = " + System.getenv("SIGNING_STORE_PASSWORD"))
             println("SIGNING_KEY_ALIAS = " + System.getenv("SIGNING_KEY_ALIAS"))
             println("SIGNING_KEY_PASSWORD = " + System.getenv("SIGNING_KEY_PASSWORD"))
-            storeFile = File(rootDir, System.getenv("KEYSTORE_FILE"))
+            System.getenv("KEYSTORE_FILE")?.let {
+                storeFile = File(rootDir, it)
+            }
             println(storeFile)
             storePassword = System.getenv("SIGNING_STORE_PASSWORD")
             keyAlias = System.getenv("SIGNING_KEY_ALIAS")
