@@ -48,8 +48,6 @@ jobs:
         run: |
           echo $ENCODED_STRING > keystore-b64.txt
           base64 -d keystore-b64.txt > $KEYSTORE_FILE
-          pwd
-          ls -l
 
       - name: Build Release apk
         env:
@@ -61,4 +59,5 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          path: app/build/outputs
+          name: ${{ github.ref_name }} + ${{ github.run_attempt }}
+          path: app/build/outputs/apk/release/app-release.apk
