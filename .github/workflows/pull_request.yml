@@ -15,6 +15,14 @@ jobs:
         run: |
             RUN_NUMBER=${{ github.run_number }}
             echo $RUN_NUMBER
+            PR_TITLE=${{ github.event.pull_request.title }}
+            echo $PR_TITLE
+          
+
+#            echo "$PR_TITLE"
+#            echo "${$PR_TITLE//[\"\:\<\>\|\*\?\\r\\n\\\/]/}"
+#``          echo "artifactName=$(find app/build/outputs/bundle/release/*.aab)" >> $GITHUB_OUTPUT
+
       - uses: actions/checkout@v4
 
       - name: Setup JDK 17
