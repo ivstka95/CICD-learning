@@ -31,9 +31,7 @@ jobs:
       - name: Dump matrix context
         env:
           MATRIX_CONTEXT: ${{ toJson(matrix) }}
-        run: |  
-          echo "MATRIX_CONTEXT----------------------------------------------"
-          echo "$MATRIX_CONTEXT"
+        run: echo "$MATRIX_CONTEXT"
 
   test:
     name: Run unit tests
@@ -89,5 +87,6 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
+          name: '${{ github.run_number }}+${{ github.event.pull_request.title }}'
           if-no-files-found: error
           path: app/build/outputs/apk/release/app-release.apk
