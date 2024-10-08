@@ -57,9 +57,21 @@ jobs:
           SIGNING_STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
         run: ./gradlew assembleRelease
 
-      - id: generateArtifactName
+      - name: Generate artifact name
+        id: generateArtifactName
         run: |
-          echo "${{ github.run_number }} ${{ github.event.pull_request.title }}" | tr -d "\"\:\<\>\|\*\" >> $GITHUB_OUTPUT
+          RUN_NUMBER="${{ github.run_number }}
+          PR_TITLE=${{ github.event.pull_request.title }}
+          echo $RUN_NUMBER
+          echo $PR_TITLE
+          echo "${$PR_TITLE//[\"\:\<\>\|\*\?\\r\\n\\\/]/}"
+#          echo "artifactName=$(find app/build/outputs/bundle/release/*.aab)" >> $GITHUB_OUTPUT
+
+#      - name: Zip Files
+#        uses: papeloto/action-zip@v1
+#        with:
+#          files: ${{ steps.releaseAab.outputs.aabfile }} ${{ steps.releaseApk.outputs.apkfile }}
+#          dest: ${{ steps.releaseApk.outputs.apkfile }}.zip
 
       - uses: actions/upload-artifact@v4
         with:
