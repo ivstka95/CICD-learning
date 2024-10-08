@@ -57,8 +57,12 @@ jobs:
           SIGNING_STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
         run: ./gradlew assembleRelease
 
+      - id: generateArtifactName
+        run: |
+          echo "${{ github.run_number }} ${{ github.event.pull_request.title }}" | tr -d "\"\:\<\>\|\*\" >> $GITHUB_OUTPUT
+
       - uses: actions/upload-artifact@v4
         with:
-          name: '${{ github.run_number }} ${{ github.event.pull_request.title }}'
+          name: ${{ github.steps.lower-repo.output }}
           if-no-files-found: error
           path: app/build/outputs/apk/release/app-release.apk
