@@ -13,9 +13,9 @@ jobs:
       - name: Generate artifact name
         id: generateArtifactName
         run: |
-            RUN_NUMBER=${{ github.run_number }}
+            RUN_NUMBER="${{ github.run_number }}"
             echo $RUN_NUMBER
-            PR_TITLE=${{ github.event.pull_request.title }}
+            PR_TITLE="${{ github.event.pull_request.title }}"
             echo $PR_TITLE
 
       - uses: actions/checkout@v4
