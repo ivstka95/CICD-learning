@@ -2,13 +2,23 @@ name: Run Tests
 
 on:
   pull_request:
-    branches: [master]
+    branches: [ master ]
 
 jobs:
-  build:
+  test:
+    name: Run unit tests
     runs-on: ubuntu-latest
 
     steps:
+      - name: Generate artifact name
+        id: generateArtifactName
+        run: |
+            RUN_NUMBER="${{ github.run_number }}"
+            echo $RUN_NUMBER
+            PR_TITLE="${${{ github.event.pull_request.title }}}"
+            echo $PR_TITLE
+
+
       - uses: actions/checkout@v4
 
       - name: Setup JDK 17
@@ -23,3 +33,47 @@ jobs:
 
       - name: Run unit tests
         run: ./gradlew clean testDebug
+
+  build:
+    name: Provide apk
+    needs: test
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 17
+          cache: 'gradle'
+
+      - name: Decode Keystore
+        env:
+          ENCODED_STRING: ${{ secrets.ANDROID_KEYSTORE }}
+          KEYSTORE_FILE: ${{ secrets.KEYSTORE_FILE }}
+
+        run: |
+          echo $ENCODED_STRING > keystore-b64.txt
+          base64 -d keystore-b64.txt > $KEYSTORE_FILE
+
+      - name: Build Release apk
+        env:
+          KEYSTORE_FILE: ${{ secrets.KEYSTORE_FILE }}
+          SIGNING_KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          SIGNING_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          SIGNING_STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        run: ./gradlew assembleRelease
+
+#      - name: Zip Files
+#        uses: papeloto/action-zip@v1
+#        with:
+#          files: ${{ steps.releaseAab.outputs.aabfile }} ${{ steps.releaseApk.outputs.apkfile }}
+#          dest: ${{ steps.releaseApk.outputs.apkfile }}.zip
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ github.steps.generateArtifactName.output }}
+          if-no-files-found: error
+          path: app/build/outputs/apk/release/app-release.apk
