@@ -15,8 +15,8 @@ jobs:
         run: |
             RUN_NUMBER="${{ github.run_number }}
             PR_TITLE=${{ github.event.pull_request.title }}
-            echo $RUN_NUMBER
-            echo $PR_TITLE
+            echo "$RUN_NUMBER"
+            echo "$PR_TITLE"
 #            echo "${$PR_TITLE//[\"\:\<\>\|\*\?\\r\\n\\\/]/}"
         #          echo "artifactName=$(find app/build/outputs/bundle/release/*.aab)" >> $GITHUB_OUTPUT
 
