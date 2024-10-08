@@ -63,6 +63,6 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
-          name: ${{ github.steps.lower-repo.output }}
+          name: ${{ github.steps.generateArtifactName.output }}
           if-no-files-found: error
           path: app/build/outputs/apk/release/app-release.apk
