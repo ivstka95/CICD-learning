@@ -1,4 +1,4 @@
-name: Run Tests
+name: Verify and build
 run-name: QA build on ${{ github.event.pull_request.title }}
 
 on:
