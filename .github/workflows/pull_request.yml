@@ -1,5 +1,5 @@
 name: Verify and build
-run-name: QA build on ${{ github.event.pull_request.title }}
+run-name: Verify and build ${{ github.event.pull_request.title }}
 
 on:
   pull_request:
@@ -39,8 +39,35 @@ jobs:
       - name: Grant execute permissions for gradlew
         run: chmod +x gradlew
 
+      - name: Run Debug Lint
+        run: ./gradlew lintDebug
+
+      - name: Upload Lint Reports
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: lint-report
+          path: '**/build/reports/lint-results-*'
+
+      - name: Run Debug ktlint
+        run: ./gradlew ktlintDebugCheck --continue
+
+      - name: Upload ktlint Reports
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: ktlint-report
+          path: '**/build/reports/ktlint'
+
       - name: Run unit tests
         run: ./gradlew testDebug
+
+      - name: Upload Test Reports
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-reports
+          path: '**/build/reports/tests/'
 
       - name: Decode Keystore
         env:
