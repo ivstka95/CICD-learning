@@ -21,7 +21,7 @@ class MainActivity : ComponentActivity() {
             CICDLearningTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Greeting(
-                        name = "Android",
+                        name = "Android 1",
                         modifier = Modifier.padding(innerPadding)
                     )
                 }
