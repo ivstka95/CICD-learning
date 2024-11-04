@@ -44,7 +44,7 @@ jobs:
 
       - name: Upload Lint Reports
         if: ${{ always() }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: lint-report
           path: '**/build/reports/lint-results-*'
@@ -54,7 +54,7 @@ jobs:
 
       - name: Upload ktlint Reports
         if: ${{ always() }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: ktlint-report
           path: '**/build/reports/ktlint'
@@ -64,7 +64,7 @@ jobs:
 
       - name: Upload Test Reports
         if: ${{ always() }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: test-reports
           path: '**/build/reports/tests/'
