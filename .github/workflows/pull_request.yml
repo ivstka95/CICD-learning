@@ -14,7 +14,6 @@ jobs:
   verifyAndBuild:
     name: Verify and build
     runs-on: ubuntu-latest
-    continue-on-error: true
 
     steps:
       - uses: actions/checkout@v4
