@@ -19,6 +19,16 @@ android {
             useSupportLibrary = true
         }
     }
+
+    lint {
+        // ./gradlew updateLintBaseline
+        // to get only new issues on lint checks
+        baseline = file("lint-baseline.xml")
+        warningsAsErrors = true
+        enable.addAll(listOf("Interoperability"))
+        ignoreTestSources = true
+    }
+
     signingConfigs {
 
         create("release") {
