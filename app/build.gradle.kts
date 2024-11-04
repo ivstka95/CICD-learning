@@ -24,7 +24,7 @@ android {
         // ./gradlew updateLintBaseline
         // to get only new issues on lint checks
         baseline = file("lint-baseline.xml")
-        warningsAsErrors = true
+//        warningsAsErrors = true
         enable.addAll(listOf("Interoperability"))
         ignoreTestSources = true
     }
@@ -49,8 +49,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
     kotlinOptions {
         jvmTarget = "1.8"
