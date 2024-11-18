@@ -109,7 +109,7 @@ jobs:
           echo 'test reports URL is ${{ steps.upload-test-reports.outputs.artifact-url }}'
           echo 'apk URL is ${{ steps.upload-apk.outputs.artifact-url }}'
 
-          #defaults:
+        #defaults:
           #  run:
           #    shell: bash
           #    working-directory: ./scripts
