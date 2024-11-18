@@ -14,7 +14,7 @@ val detektTask = tasks.register<JavaExec>("detekt") {
     val input = projectDir
     val config = "$projectDir/config/detekt/detekt.yml"
     val exclude = ".*/build/.*,.*/resources/.*"
-    val report = "html:reports/detekt.html"
+    val report = "html:reports/detekt.html,sarif:reports/detekt.sarif"
     val plugins = "plugins/detekt-twitter-compose-0.0.26-all.jar"
     val params = listOf("-i", input, "-c", config, "-ex", exclude, "-r", report, "-p", plugins)
 

@@ -48,16 +48,25 @@ jobs:
           name: lint-report
           path: '**/build/reports/lint-results-*'
 
-      - name: Run Debug ktlint
-        if: ${{ always() }}
-        run: ./gradlew ktlintDebugCheck --continue
+      - name: Run detekt
+        run: ./gradlew detekt
 
-      - name: Upload ktlint Reports
-        if: ${{ always() }}
-        uses: actions/upload-artifact@v4
+      - name: Upload SARIF to GitHub using the upload-sarif action
+        uses: github/codeql-action/upload-sarif@v2
+        if: success() || failure()
         with:
-          name: ktlint-report
-          path: '**/build/reports/ktlint'
+          sarif_file: reports/detekt.sarif
+
+#      - name: Run Debug ktlint
+#        if: ${{ always() }}
+#        run: ./gradlew ktlintDebugCheck --continue
+#
+#      - name: Upload ktlint Reports
+#        if: ${{ always() }}
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: ktlint-report
+#          path: '**/build/reports/ktlint'
 
       - name: Run unit tests
         if: ${{ always() }}
