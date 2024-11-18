@@ -48,6 +48,9 @@ jobs:
           name: lint-report
           path: '**/build/reports/lint-results-*'
 
+      - name: Output artifact ID
+        run: echo 'Artifact ID is ${{ steps.artifact-upload-step.outputs.artifact-id }}'
+
       - name: Run detekt
         run: ./gradlew detekt
 
@@ -79,6 +82,9 @@ jobs:
           name: test-reports
           path: '**/build/reports/tests/'
 
+      - name: Output artifact ID
+        run: echo 'Artifact ID is ${{ steps.artifact-upload-step.outputs.artifact-id }}'
+
       - name: Decode Keystore
         env:
           ENCODED_STRING: ${{ secrets.ANDROID_KEYSTORE }}
@@ -102,6 +108,9 @@ jobs:
           name: build
           if-no-files-found: error
           path: app/build/outputs/apk/release/app-release.apk
+
+      - name: Output artifact ID
+        run: echo 'Artifact ID is ${{ steps.artifact-upload-step.outputs.artifact-id }}'
 
       - name: Output urls
         run: |
