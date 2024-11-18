@@ -49,7 +49,7 @@ jobs:
           path: '**/build/reports/lint-results-*'
 
       - name: Output artifact ID
-        run: echo 'Artifact ID is ${{ steps.artifact-upload-step.outputs.artifact-id }}'
+        run: echo "Artifact ID is ${{ steps.artifact-upload-step.outputs.artifact-id }}"
 
       - name: Run detekt
         run: ./gradlew detekt
@@ -83,7 +83,7 @@ jobs:
           path: '**/build/reports/tests/'
 
       - name: Output artifact ID
-        run: echo 'Artifact ID is ${{ steps.artifact-upload-step.outputs.artifact-id }}'
+        run: echo "Artifact ID is ${{ steps.artifact-upload-step.outputs.artifact-id }}"
 
       - name: Decode Keystore
         env:
@@ -110,13 +110,13 @@ jobs:
           path: app/build/outputs/apk/release/app-release.apk
 
       - name: Output artifact ID
-        run: echo 'Artifact ID is ${{ steps.Upload-apk.outputs.artifact-id }}'
+        run: echo "Artifact ID is ${{ steps.Upload-apk.outputs.artifact-id }}"
 
       - name: Output urls
         run: |
-          echo 'lint reports URL is ${{ steps.Upload-Lint-Reports.outputs.artifact-url }}'
-          echo 'test reports URL is ${{ steps.Upload-Test-Reports.outputs.artifact-url }}'
-          echo 'apk URL is ${{ steps.Upload-apk.outputs.artifact-url }}'
+          echo "lint reports URL is ${{ steps.Upload-Lint-Reports.outputs.artifact-url }}"
+          echo "test reports URL is ${{ steps.Upload-Test-Reports.outputs.artifact-url }}"
+          echo "apk URL is ${{ steps.Upload-apk.outputs.artifact-url }}"
 
       - name: Output urls
         run: |
