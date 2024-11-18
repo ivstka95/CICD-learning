@@ -118,6 +118,13 @@ jobs:
           echo 'test reports URL is ${{ steps.Upload-Test-Reports.outputs.artifact-url }}'
           echo 'apk URL is ${{ steps.Upload-apk.outputs.artifact-url }}'
 
+      - name: Output urls
+        run: |
+          echo "lint reports URL is ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/lint-report"
+          echo "test reports URL is ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/test-reports"
+          echo "apk URL is ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/build"
+
+
         #defaults:
           #  run:
           #    shell: bash
