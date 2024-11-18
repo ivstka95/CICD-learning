@@ -114,9 +114,9 @@ jobs:
 
       - name: Output urls
         run: |
-          echo 'lint reports URL is ${{ steps.upload-lint-reports.outputs.artifact-url }}'
-          echo 'test reports URL is ${{ steps.upload-test-reports.outputs.artifact-url }}'
-          echo 'apk URL is ${{ steps.upload-apk.outputs.artifact-url }}'
+          echo 'lint reports URL is ${{ steps.Upload-Lint-Reports.outputs.artifact-url }}'
+          echo 'test reports URL is ${{ steps.Upload-Test-Reports.outputs.artifact-url }}'
+          echo 'apk URL is ${{ steps.Upload-apk.outputs.artifact-url }}'
 
         #defaults:
           #  run:
