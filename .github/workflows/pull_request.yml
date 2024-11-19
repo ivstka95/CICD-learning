@@ -14,33 +14,33 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  dump_contexts_to_log:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Dump GitHub context
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-        run: echo "$GITHUB_CONTEXT"
-      - name: Dump job context
-        env:
-          JOB_CONTEXT: ${{ toJson(job) }}
-        run: echo "$JOB_CONTEXT"
-      - name: Dump steps context
-        env:
-          STEPS_CONTEXT: ${{ toJson(steps) }}
-        run: echo "$STEPS_CONTEXT"
-      - name: Dump runner context
-        env:
-          RUNNER_CONTEXT: ${{ toJson(runner) }}
-        run: echo "$RUNNER_CONTEXT"
-      - name: Dump strategy context
-        env:
-          STRATEGY_CONTEXT: ${{ toJson(strategy) }}
-        run: echo "$STRATEGY_CONTEXT"
-      - name: Dump matrix context
-        env:
-          MATRIX_CONTEXT: ${{ toJson(matrix) }}
-        run: echo "$MATRIX_CONTEXT"
+#  dump_contexts_to_log:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Dump GitHub context
+#        env:
+#          GITHUB_CONTEXT: ${{ toJson(github) }}
+#        run: echo "$GITHUB_CONTEXT"
+#      - name: Dump job context
+#        env:
+#          JOB_CONTEXT: ${{ toJson(job) }}
+#        run: echo "$JOB_CONTEXT"
+#      - name: Dump steps context
+#        env:
+#          STEPS_CONTEXT: ${{ toJson(steps) }}
+#        run: echo "$STEPS_CONTEXT"
+#      - name: Dump runner context
+#        env:
+#          RUNNER_CONTEXT: ${{ toJson(runner) }}
+#        run: echo "$RUNNER_CONTEXT"
+#      - name: Dump strategy context
+#        env:
+#          STRATEGY_CONTEXT: ${{ toJson(strategy) }}
+#        run: echo "$STRATEGY_CONTEXT"
+#      - name: Dump matrix context
+#        env:
+#          MATRIX_CONTEXT: ${{ toJson(matrix) }}
+#        run: echo "$MATRIX_CONTEXT"
 
   verifyAndBuild:
     name: Verify and build
@@ -70,19 +70,19 @@ jobs:
         run: chmod +x gradlew
 
       - name: Run Debug Lint
-        if: ${{ always() }}
+        if: success() || failure()
         run: ./gradlew lintDebug
 
       - name: Upload Lint Reports
         id: uploadLintReports
-        if: ${{ always() }}
+        if: success() || failure()
         uses: actions/upload-artifact@v4
         with:
           name: lint-report
           path: '**/build/reports/lint-results-*'
 
       - name: Run detekt
-        if: ${{ always() }}
+        if: success() || failure()
         run: ./gradlew detekt
 
       - name: Upload SARIF
@@ -92,12 +92,12 @@ jobs:
           sarif_file: reports/detekt.sarif
 
       - name: Run unit tests
-        if: ${{ always() }}
+        if: success() || failure()
         run: ./gradlew testDebug
 
       - name: Upload Test Reports
         id: uploadTestReports
-        if: ${{ always() }}
+        if: success() || failure()
         uses: actions/upload-artifact@v4
         with:
           name: test-reports
@@ -129,7 +129,7 @@ jobs:
           path: app/build/outputs/apk/release/app-release.apk
 
       - name: Log artifacts url
-        if: ${{ always() }}
+        if: success() || failure()
         run: |
           echo "lint reports URL is ${{ steps.uploadLintReports.outputs.artifact-url }}"
           echo "test reports URL is ${{ steps.uploadTestReports.outputs.artifact-url }}"
