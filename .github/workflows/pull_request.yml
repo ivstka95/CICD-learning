@@ -128,15 +128,8 @@ jobs:
           if-no-files-found: error
           path: app/build/outputs/apk/release/app-release.apk
 
-      - name: Log artifacts url
-        if: success() || failure()
-        run: |
-          echo "lint reports URL is ${{ steps.uploadLintReports.outputs.artifact-url }}"
-          echo "test reports URL is ${{ steps.uploadTestReports.outputs.artifact-url }}"
-          echo "apk URL is ${{ steps.uploadApk.outputs.artifact-url }}"
-
       - name: Comment artifacts url
-        if: ${{ always() }}
+        if: success() || failure()
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
