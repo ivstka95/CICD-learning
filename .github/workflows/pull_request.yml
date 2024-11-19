@@ -145,17 +145,17 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh pr comment ${{ github.event.number }} --body "Hi from GitHub CLI"
-          
-          #          echo "lint reports URL is ${{ steps.uploadLintReports.outputs.artifact-url }}"
-          #          echo "test reports URL is ${{ steps.uploadTestReports.outputs.artifact-url }}"
-          #          echo "apk URL is ${{ steps.uploadApk.outputs.artifact-url }}"
-          
-          
-          
-          #defaults:
-          #  run:
-          #    shell: bash
-          #    working-directory: ./scripts
+
+#                   echo "lint reports URL is ${{ steps.uploadLintReports.outputs.artifact-url }}"
+#                    echo "test reports URL is ${{ steps.uploadTestReports.outputs.artifact-url }}"
+#                    echo "apk URL is ${{ steps.uploadApk.outputs.artifact-url }}"
+#
+#
+#
+#          defaults:
+#            run:
+#              shell: bash
+        #    working-directory: ./scripts
         
 
         #env:
