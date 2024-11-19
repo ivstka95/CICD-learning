@@ -39,6 +39,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Run Debug Lint
+        if: ${{ always() }}
         run: ./gradlew lintDebug
 
       - name: Upload Lint Reports
@@ -49,10 +50,8 @@ jobs:
           name: lint-report
           path: '**/build/reports/lint-results-*'
 
-      - name: Output artifact ID
-        run: echo "uploadLintReports is ${{ steps.uploadLintReports.outputs.artifact-url }}"
-
       - name: Run detekt
+        if: ${{ always() }}
         run: ./gradlew detekt
 
       - name: Upload SARIF
@@ -60,17 +59,6 @@ jobs:
         if: success() || failure()
         with:
           sarif_file: reports/detekt.sarif
-
-      #      - name: Run Debug ktlint
-      #        if: ${{ always() }}
-      #        run: ./gradlew ktlintDebugCheck --continue
-      #
-      #      - name: Upload ktlint Reports
-      #        if: ${{ always() }}
-      #        uses: actions/upload-artifact@v4
-      #        with:
-      #          name: ktlint-report
-      #          path: '**/build/reports/ktlint'
 
       - name: Run unit tests
         if: ${{ always() }}
@@ -83,9 +71,6 @@ jobs:
         with:
           name: test-reports
           path: '**/build/reports/tests/'
-
-      - name: Output artifact ID
-        run: echo "uploadTestReports is ${{ steps.uploadTestReports.outputs.artifact-url }}"
 
       - name: Decode Keystore
         env:
@@ -112,21 +97,12 @@ jobs:
           if-no-files-found: error
           path: app/build/outputs/apk/release/app-release.apk
 
-      - name: Output artifact ID
-        run: echo "uploadApk is ${{ steps.uploadApk.outputs.artifact-url }}"
-
-      - name: Output urls
+      - name: Comment artifacts url
+        if: ${{ always() }}
         run: |
-          echo "lint reports URL is ${{ steps.Upload-Lint-Reports.outputs.artifact-url }}"
-          echo "test reports URL is ${{ steps.Upload-Test-Reports.outputs.artifact-url }}"
-          echo "apk URL is ${{ steps.Upload-apk.outputs.artifact-url }}"
-
-      - name: Output urls
-        run: |
-          echo "lint reports URL is ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/lint-report"
-          echo "test reports URL is ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/test-reports"
-          echo "apk URL is ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/build"
-
+          echo "lint reports URL is ${{ steps.uploadLintReports.outputs.artifact-url }}"
+          echo "test reports URL is ${{ steps.uploadTestReports.outputs.artifact-url }}"
+          echo "apk URL is ${{ steps.uploadApk.outputs.artifact-url }}"
 
         #defaults:
           #  run:
