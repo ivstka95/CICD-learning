@@ -132,18 +132,18 @@ jobs:
           echo "test reports URL is ${{ steps.uploadTestReports.outputs.artifact-url }}"
           echo "apk URL is ${{ steps.uploadApk.outputs.artifact-url }}"
 
-#      - name: Comment artifacts url
-#        if: ${{ always() }}
-#        run: |
-#          gh pr comment 13 --body "Hi from GitHub CLI"
-#
+      - name: Comment artifacts url
+        if: ${{ always() }}
+        run: |
+          gh pr comment ${{ github.event.number }} --body "Hi from GitHub CLI"
+
 #          echo "lint reports URL is ${{ steps.uploadLintReports.outputs.artifact-url }}"
 #          echo "test reports URL is ${{ steps.uploadTestReports.outputs.artifact-url }}"
 #          echo "apk URL is ${{ steps.uploadApk.outputs.artifact-url }}"
           
           
           
-          #defaults:
+        #defaults:
           #  run:
           #    shell: bash
           #    working-directory: ./scripts
