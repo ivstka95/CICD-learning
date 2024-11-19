@@ -17,13 +17,6 @@ jobs:
   dump_contexts_to_log:
     runs-on: ubuntu-latest
     steps:
-      - name: Comment artifacts url
-        if: ${{ always() }}
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh pr comment ${{ github.event.number }} --body "Hi from GitHub CLI"
-
       - name: Dump GitHub context
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
@@ -147,14 +140,12 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh pr comment ${{ github.event.number }} --body "Hi from GitHub CLI"
+          gh pr comment ${{ github.event.number }} --body "
+          Lint report: ${{ steps.uploadLintReports.outputs.artifact-url }}
+          Unit tests report: ${{ steps.uploadTestReports.outputs.artifact-url }}
+          Apk: ${{ steps.uploadApk.outputs.artifact-url }}
+          "
 
-#                   echo "lint reports URL is ${{ steps.uploadLintReports.outputs.artifact-url }}"
-#                    echo "test reports URL is ${{ steps.uploadTestReports.outputs.artifact-url }}"
-#                    echo "apk URL is ${{ steps.uploadApk.outputs.artifact-url }}"
-#
-#
-#
 #          defaults:
 #            run:
 #              shell: bash
