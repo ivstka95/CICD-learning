@@ -11,6 +11,34 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  dump_contexts_to_log:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
+      - name: Dump job context
+        env:
+          JOB_CONTEXT: ${{ toJson(job) }}
+        run: echo "$JOB_CONTEXT"
+      - name: Dump steps context
+        env:
+          STEPS_CONTEXT: ${{ toJson(steps) }}
+        run: echo "$STEPS_CONTEXT"
+      - name: Dump runner context
+        env:
+          RUNNER_CONTEXT: ${{ toJson(runner) }}
+        run: echo "$RUNNER_CONTEXT"
+      - name: Dump strategy context
+        env:
+          STRATEGY_CONTEXT: ${{ toJson(strategy) }}
+        run: echo "$STRATEGY_CONTEXT"
+      - name: Dump matrix context
+        env:
+          MATRIX_CONTEXT: ${{ toJson(matrix) }}
+        run: echo "$MATRIX_CONTEXT"
+
   verifyAndBuild:
     name: Verify and build
     runs-on: ubuntu-latest
@@ -97,21 +125,32 @@ jobs:
           if-no-files-found: error
           path: app/build/outputs/apk/release/app-release.apk
 
-      - name: Comment artifacts url
+      - name: Log artifacts url
         if: ${{ always() }}
         run: |
           echo "lint reports URL is ${{ steps.uploadLintReports.outputs.artifact-url }}"
           echo "test reports URL is ${{ steps.uploadTestReports.outputs.artifact-url }}"
           echo "apk URL is ${{ steps.uploadApk.outputs.artifact-url }}"
 
-        #defaults:
+#      - name: Comment artifacts url
+#        if: ${{ always() }}
+#        run: |
+#          gh pr comment 13 --body "Hi from GitHub CLI"
+#
+#          echo "lint reports URL is ${{ steps.uploadLintReports.outputs.artifact-url }}"
+#          echo "test reports URL is ${{ steps.uploadTestReports.outputs.artifact-url }}"
+#          echo "apk URL is ${{ steps.uploadApk.outputs.artifact-url }}"
+          
+          
+          
+          #defaults:
           #  run:
           #    shell: bash
           #    working-directory: ./scripts
 
 
           #env:
-          #  DAY_OF_WEEK: Monday
+        #  DAY_OF_WEEK: Monday
 
       #  greeting_job:
       #    runs-on: ubuntu-latest
@@ -128,34 +167,6 @@ jobs:
       #        run: echo "${{ env.Greeting }} ${{ env.First_Name }}. Today is ${{ env.DAY_OF_WEEK }}!"
       #        env:
       #          First_Name: Mona
-
-      #  dump_contexts_to_log:
-      #    runs-on: ubuntu-latest
-      #    steps:
-      #      - name: Dump GitHub context
-      #        env:
-      #          GITHUB_CONTEXT: ${{ toJson(github) }}
-      #        run: echo "$GITHUB_CONTEXT"
-      #      - name: Dump job context
-      #        env:
-      #          JOB_CONTEXT: ${{ toJson(job) }}
-      #        run: echo "$JOB_CONTEXT"
-      #      - name: Dump steps context
-      #        env:
-      #          STEPS_CONTEXT: ${{ toJson(steps) }}
-      #        run: echo "$STEPS_CONTEXT"
-      #      - name: Dump runner context
-      #        env:
-      #          RUNNER_CONTEXT: ${{ toJson(runner) }}
-      #        run: echo "$RUNNER_CONTEXT"
-      #      - name: Dump strategy context
-      #        env:
-      #          STRATEGY_CONTEXT: ${{ toJson(strategy) }}
-      #        run: echo "$STRATEGY_CONTEXT"
-      #      - name: Dump matrix context
-      #        env:
-      #          MATRIX_CONTEXT: ${{ toJson(matrix) }}
-      #        run: echo "$MATRIX_CONTEXT"
 
       #  job1:
       #    runs-on: ubuntu-latest
