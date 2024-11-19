@@ -50,7 +50,7 @@ jobs:
           path: '**/build/reports/lint-results-*'
 
       - name: Output artifact ID
-        run: echo "uploadLintReports is ${{ steps.uploadLintReports.outputs.* }}"
+        run: echo "uploadLintReports is ${{ steps.uploadLintReports.outputs.artifact-url }}"
 
       - name: Run detekt
         run: ./gradlew detekt
@@ -85,7 +85,7 @@ jobs:
           path: '**/build/reports/tests/'
 
       - name: Output artifact ID
-        run: echo "uploadTestReports is ${{ steps.uploadTestReports.outputs.* }}"
+        run: echo "uploadTestReports is ${{ steps.uploadTestReports.outputs.artifact-url }}"
 
       - name: Decode Keystore
         env:
@@ -113,7 +113,7 @@ jobs:
           path: app/build/outputs/apk/release/app-release.apk
 
       - name: Output artifact ID
-        run: echo "uploadApk is ${{ steps.uploadApk.outputs.* }}"
+        run: echo "uploadApk is ${{ steps.uploadApk.outputs.artifact-url }}"
 
       - name: Output urls
         run: |
