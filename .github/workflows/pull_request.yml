@@ -5,6 +5,9 @@ on:
   pull_request:
     branches: [ master ]
 
+permissions:
+  pull-requests: write
+
 #to cancel currently running workflow for same pr if new changes pushed
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
