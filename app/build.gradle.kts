@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.compose.compiler)
 }
 
 android {
@@ -20,8 +21,30 @@ android {
         }
     }
 
+    lint {
+        // ./gradlew updateLintBaseline
+        // to get only new issues on lint checks
+        baseline = file("lint-baseline.xml")
+//        warningsAsErrors = true
+        enable.addAll(listOf("Interoperability"))
+        ignoreTestSources = true
+    }
+
+    signingConfigs {
+
+        create("release") {
+            System.getenv("KEYSTORE_FILE")?.let {
+                storeFile = File(rootDir, it)
+            }
+            storePassword = System.getenv("SIGNING_STORE_PASSWORD")
+            keyAlias = System.getenv("SIGNING_KEY_ALIAS")
+            keyPassword = System.getenv("SIGNING_KEY_PASSWORD")
+        }
+    }
+
     buildTypes {
         release {
+            signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
@@ -35,9 +58,6 @@ android {
     }
     buildFeatures {
         compose = true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
     }
     packaging {
         resources {

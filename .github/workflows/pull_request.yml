@@ -1,17 +1,65 @@
-name: Run Tests
+name: Verify and build
+run-name: Verify and build ${{ github.event.pull_request.title }}
 
 on:
   pull_request:
-    branches: [master]
+    branches: [ master ]
+
+permissions:
+  pull-requests: write
+
+#to cancel currently running workflow for same pr if new changes pushed
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  build:
+#  dump_contexts_to_log:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Dump GitHub context
+#        env:
+#          GITHUB_CONTEXT: ${{ toJson(github) }}
+#        run: echo "$GITHUB_CONTEXT"
+#      - name: Dump job context
+#        env:
+#          JOB_CONTEXT: ${{ toJson(job) }}
+#        run: echo "$JOB_CONTEXT"
+#      - name: Dump steps context
+#        env:
+#          STEPS_CONTEXT: ${{ toJson(steps) }}
+#        run: echo "$STEPS_CONTEXT"
+#      - name: Dump runner context
+#        env:
+#          RUNNER_CONTEXT: ${{ toJson(runner) }}
+#        run: echo "$RUNNER_CONTEXT"
+#      - name: Dump strategy context
+#        env:
+#          STRATEGY_CONTEXT: ${{ toJson(strategy) }}
+#        run: echo "$STRATEGY_CONTEXT"
+#      - name: Dump matrix context
+#        env:
+#          MATRIX_CONTEXT: ${{ toJson(matrix) }}
+#        run: echo "$MATRIX_CONTEXT"
+
+  verifyAndBuild:
+    name: Verify and build
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup JDK 17
+      - name: Restore cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
@@ -21,5 +69,169 @@ jobs:
       - name: Grant execute permissions for gradlew
         run: chmod +x gradlew
 
+      - name: Run Debug Lint
+        if: success() || failure()
+        run: ./gradlew lintDebug
+
+      - name: Upload Lint Reports
+        id: uploadLintReports
+        if: success() || failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lint-report
+          path: '**/build/reports/lint-results-*'
+
+      - name: Run detekt
+        if: success() || failure()
+        run: ./gradlew detekt
+
+      - name: Upload SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        if: success() || failure()
+        with:
+          sarif_file: reports/detekt.sarif
+
       - name: Run unit tests
-        run: ./gradlew clean testDebug
+        if: success() || failure()
+        run: ./gradlew testDebug
+
+      - name: Upload Test Reports
+        id: uploadTestReports
+        if: success() || failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: '**/build/reports/tests/'
+
+      - name: Decode Keystore
+        env:
+          ENCODED_STRING: ${{ secrets.ANDROID_KEYSTORE }}
+          KEYSTORE_FILE: ${{ secrets.KEYSTORE_FILE }}
+
+        run: |
+          echo $ENCODED_STRING > keystore-b64.txt
+          base64 -d keystore-b64.txt > $KEYSTORE_FILE
+
+      - name: Build Release apk
+        env:
+          KEYSTORE_FILE: ${{ secrets.KEYSTORE_FILE }}
+          SIGNING_KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          SIGNING_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          SIGNING_STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        run: ./gradlew assembleRelease
+
+      - name: Upload apk
+        id: uploadApk
+        uses: actions/upload-artifact@v4
+        with:
+          name: build
+          if-no-files-found: error
+          path: app/build/outputs/apk/release/app-release.apk
+
+      - name: Comment artifacts url
+        if: success() || failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr comment ${{ github.event.number }} --body "
+          Lint report: ${{ steps.uploadLintReports.outputs.artifact-url }}
+          Unit tests report: ${{ steps.uploadTestReports.outputs.artifact-url }}
+          Apk: ${{ steps.uploadApk.outputs.artifact-url }}
+          "
+
+#          defaults:
+#            run:
+#              shell: bash
+        #    working-directory: ./scripts
+        
+
+        #env:
+        #  DAY_OF_WEEK: Monday
+
+      #  greeting_job:
+      #    runs-on: ubuntu-latest
+      #    env:
+      #      Greeting: Hello
+      #    steps:
+      #      - name: "Say Hello Mona it's Monday"
+      #        if: ${{ env.DAY_OF_WEEK == 'Monday' }}
+      #        run: echo "$Greeting $First_Name. Today is $DAY_OF_WEEK!"
+      #        env:
+      #          First_Name: Mona
+      #
+      #      - name: another way
+      #        run: echo "${{ env.Greeting }} ${{ env.First_Name }}. Today is ${{ env.DAY_OF_WEEK }}!"
+      #        env:
+      #          First_Name: Mona
+
+      #  job1:
+      #    runs-on: ubuntu-latest
+      #    # Map a step output to a job output
+      #    outputs:
+      #      output1: ${{ steps.step1.outputs.test }}
+      #      output2: ${{ steps.step2.outputs.test }}
+      #    steps:
+      #      - id: step1
+      #        run: echo "test=hello" >> "$GITHUB_OUTPUT"
+      #      - id: step2
+      #        run: echo "test=world" >> "$GITHUB_OUTPUT"
+      #  job2:
+      #      runs-on: ubuntu-latest
+      #      needs: job1
+      #      steps:
+      #        - env:
+      #            OUTPUT1: ${{needs.job1.outputs.output1}}
+      #            OUTPUT2: ${{needs.job1.outputs.output2}}
+      #          run: echo "$OUTPUT1 $OUTPUT2"
+
+      #      - name: Generate artifact name
+      #        id: generateArtifactName
+      #        env:
+      #          super_secret: ${{ secrets.SUPERSECRET }}
+      #        run: |
+      #          RUN_NUMBER="${{ github.run_number }}"
+      #          echo $RUN_NUMBER
+      #
+      #
+      #          PR_TITLE="${${{ github.event.pull_request.title }}}"
+      #          echo $PR_TITLE
+      #
+      #      - name: Set color
+      #        id: color-selector
+      #        run: echo "SELECTED_COLOR=green" >> "$GITHUB_OUTPUT"
+      #
+      #      - name: Get color
+      #        env:
+      #          SELECTED_COLOR: ${{ steps.color-selector.outputs.SELECTED_COLOR }}
+      #        run: echo "The selected color is $SELECTED_COLOR"
+      #
+      #      - name: Set the value
+      #        id: step_one
+      #        run: |
+      #          echo "action_state=yellow" >> "$GITHUB_ENV"
+      #      - name: Use the value
+      #        id: step_two
+      #        run: |
+      #          printf '%s\n' "$action_state" # This will output 'yellow'
+      #
+      #      - name: Set the value
+      #        id: step_one
+      #        run: |
+      #          echo "action_state=yellow" >> "$GITHUB_ENV"
+      #      - name: Use the value
+      #        id: step_two
+      #        run: |
+      #          printf '%s\n' "$action_state" # This will output 'yellow'
+
+
+      #      - name: Run debug ktlint
+      #        run: ./gradlew ktlintDebugCheck
+      #
+      #      - name: Run debug lint
+      #        run: ./gradlew lintDebug
+
+      #      - name: Zip Files
+      #        uses: papeloto/action-zip@v1
+      #        with:
+      #          files: ${{ steps.releaseAab.outputs.aabfile }} ${{ steps.releaseApk.outputs.apkfile }}
+      #          dest: ${{ steps.releaseApk.outputs.apkfile }}.zip
