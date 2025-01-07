@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.dependency.guard)
 }
 
 android {
@@ -83,4 +84,13 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+}
+
+dependencyGuard {
+    configuration("releaseRuntimeClasspath") {
+        allowedFilter = {
+            // Disallow dependencies with a name containing "junit"
+            !it.contains("junit")
+        }
+    }
 }
