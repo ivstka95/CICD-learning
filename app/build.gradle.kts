@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.dependency.guard)
+    alias(libs.plugins.dependency.check)
 }
 
 android {
@@ -92,5 +93,11 @@ dependencyGuard {
             // Disallow dependencies with a name containing "junit"
             !it.contains("junit")
         }
+    }
+}
+
+dependencyCheck {
+    nvd {
+        apiKey = "62cf5ed5-84f8-4992-9c9e-dbd0e1f4bb02"
     }
 }
