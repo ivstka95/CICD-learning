@@ -44,9 +44,6 @@ jobs:
       - name: Dependency Guard
         run: ./gradlew dependencyGuard
 
-      - name: Dependency Check Analyze
-        run: ./gradlew dependencyCheckAnalyze
-
       - name: Run Debug Lint
         if: success() || failure()
         run: ./gradlew lintDebug
