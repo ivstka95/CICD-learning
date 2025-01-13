@@ -10,7 +10,7 @@ permissions:
 
 #to cancel currently running workflow for same pr if new changes pushed
 concurrency:
-  group: Dependency check ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
