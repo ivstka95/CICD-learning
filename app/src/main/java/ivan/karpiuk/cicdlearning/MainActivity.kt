@@ -37,7 +37,7 @@ fun Greeting(
     modifier: Modifier = Modifier
 ) {
     Text(
-        text = "Hello $name!",
+        text = "Helldo $name!",
         modifier = modifier,
         color = Colors.Pink80
     )
