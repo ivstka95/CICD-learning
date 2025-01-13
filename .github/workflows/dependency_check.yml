@@ -1,5 +1,5 @@
-name: Verify and build
-run-name: Verify and build ${{ github.event.pull_request.title }}
+name: Dependency check
+run-name: Dependency check ${{ github.event.pull_request.title }}
 
 on:
   pull_request:
