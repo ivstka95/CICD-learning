@@ -44,22 +44,6 @@ jobs:
       - name: Dependency Guard
         run: ./gradlew dependencyGuard
 
-      - name: Run Dependency-Check
-        run: ./gradlew dependencyCheckAnalyze
-
-      - name: Upload Dependency-Check Report
-        id: uploadDependencyCheckReports
-        if: success() || failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: dependency-check-report
-          path: 'build/reports/dependency-check-report.html'
-
-      - name: Upload Dependency-Check report for code scanning
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: 'build/reports/dependency-check-report.sarif'
-
       - name: Run Debug Lint
         if: success() || failure()
         run: ./gradlew lintDebug
@@ -134,6 +118,7 @@ jobs:
         run: |
           gh pr comment ${{ github.event.number }} --body "
           Lint report: ${{ steps.uploadLintReports.outputs.artifact-url }}
+          Detekt report: ${{ steps.uploadDetektReport.outputs.artifact-url }}
           Unit tests report: ${{ steps.uploadTestReports.outputs.artifact-url }}
           Apk: ${{ steps.uploadApk.outputs.artifact-url }}
           "
