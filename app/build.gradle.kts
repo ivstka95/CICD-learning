@@ -88,9 +88,21 @@ dependencies {
 
 dependencyGuard {
     configuration("releaseRuntimeClasspath") {
-        allowedFilter = {
+        // What is included in the list report
+        artifacts = true // Defaults to true
+        modules = false // Defaults to false
+
+        // Tree Report
+        tree = false // Defaults to false
+
+        // Filter through dependencies and return true if allowed.  Build will fail if unallowed.
+        allowedFilter = { dependencyName: String ->
             // Disallow dependencies with a name containing "junit"
-            !it.contains("junit")
+            !dependencyName.contains("junit")
+        }
+        // Modify a dependency name or remove it (by returning null) from the baseline file
+        baselineMap = { dependencyName: String ->
+            dependencyName // Defaults to return itself
         }
     }
 }
