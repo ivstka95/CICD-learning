@@ -8,6 +8,8 @@ plugins {
 
 val detekt: Configuration by configurations.creating
 
+private val reportsFolder: String = layout.buildDirectory.dir("reports").get().asFile.absolutePath
+
 val detektTask = tasks.register<JavaExec>("detekt") {
     mainClass = "io.gitlab.arturbosch.detekt.cli.Main"
     classpath = detekt
@@ -15,7 +17,7 @@ val detektTask = tasks.register<JavaExec>("detekt") {
     val input = projectDir
     val config = "$projectDir/config/detekt/detekt.yml"
     val exclude = ".*/build/.*,.*/resources/.*"
-    val report = "html:reports/detekt.html,sarif:reports/detekt.sarif"
+    val report = "html:$reportsFolder/detekt.html,sarif:$reportsFolder/detekt.sarif"
     val plugins = "plugins/detekt-twitter-compose-0.0.26-all.jar"
     val params = listOf("-i", input, "-c", config, "-ex", exclude, "-r", report, "-p", plugins)
 
@@ -46,5 +48,5 @@ dependencyCheck {
         bundleAuditEnabled = false // Disable Ruby bundle audit analyzer
     }
     formats = listOf("HTML", "SARIF") // Generate HTML and SARIF reports
-    outputDirectory = layout.buildDirectory.dir("dependency-check-report").get().asFile.absolutePath
+    outputDirectory = reportsFolder
 }
