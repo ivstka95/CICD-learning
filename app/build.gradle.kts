@@ -29,6 +29,7 @@ android {
 //        warningsAsErrors = true
         enable.addAll(listOf("Interoperability"))
         ignoreTestSources = true
+        sarifReport = true
     }
 
     signingConfigs {
