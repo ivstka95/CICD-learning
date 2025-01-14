@@ -1,5 +1,5 @@
-name: Verify and build MY Ivan name
-run-name: Verify and build run name ${{ github.event.pull_request.title }}
+name: Verify code, provide apk
+run-name: Verify code, provide apk for ${{ github.event.pull_request.title }}
 
 on:
   pull_request:
@@ -14,10 +14,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  verifyAndBuild:
-    name: Verify and build
+  setUp:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
 
@@ -41,6 +39,41 @@ jobs:
       - name: Grant execute permissions for gradlew
         run: chmod +x gradlew
 
+  checkDependencies:
+    name: Check dependencies for vulnerabilities
+    needs: setUp
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Run Dependency-Check
+        run: ./gradlew dependencyCheckAnalyze
+
+      - name: Upload Dependency-Check Report
+        id: uploadDependencyCheckReport
+        if: success() || failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-check-report
+          path: 'build/reports/dependency-check-report.html'
+
+      - name: Upload Dependency-Check report for code scanning
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: 'build/reports/dependency-check-report.sarif'
+
+      - name: Comment artifacts url
+        if: success() || failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr comment ${{ github.event.number }} --body "Dependency check report: ${{ steps.uploadDependencyCheckReport.outputs.artifact-url }}"
+
+  verifyAndBuild:
+    name: Verify and build
+    needs: setUp
+    runs-on: ubuntu-latest
+
+    steps:
       - name: Dependency Guard
         run: ./gradlew dependencyGuard
 
