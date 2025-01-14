@@ -14,7 +14,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  verifyAndBuild:
+  checkDependencies:
     name: Verify and build
     runs-on: ubuntu-latest
 
