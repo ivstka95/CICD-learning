@@ -1,5 +1,5 @@
 name: Dependency check MY Ivan name
-run-name: Dependency check run name ${{ github.event.pull_request.title }}
+run-name: Check dependencies for vulnerabilities run name ${{ github.event.pull_request.title }}
 
 on:
   pull_request:
@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   checkDependencies:
-    name: Verify and build
+    name: Check dependencies for vulnerabilities
     runs-on: ubuntu-latest
 
     steps:
