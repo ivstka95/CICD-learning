@@ -1,19 +1,4 @@
-name: Verify and build
-run-name: Verify and build ${{ github.event.pull_request.title }}
 
-on:
-  pull_request:
-    branches: [ master ]
-
-permissions:
-  pull-requests: write
-
-#to cancel currently running workflow for same pr if new changes pushed
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
-jobs:
   #  dump_contexts_to_log:
   #    runs-on: ubuntu-latest
   #    steps:
@@ -42,111 +27,12 @@ jobs:
   #          MATRIX_CONTEXT: ${{ toJson(matrix) }}
   #        run: echo "$MATRIX_CONTEXT"
 
-  verifyAndBuild:
-    name: Verify and build
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Restore cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: 17
-          cache: 'gradle'
-
-      - name: Grant execute permissions for gradlew
-        run: chmod +x gradlew
-
-      - name: Dependency Guard
-        run: ./gradlew dependencyGuard
-
-      - name: Run Debug Lint
-        if: success() || failure()
-        run: ./gradlew lintDebug
-
-      - name: Upload Lint Reports
-        id: uploadLintReports
-        if: success() || failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: lint-report
-          path: '**/build/reports/lint-results-*'
-
-      - name: Run detekt
-        if: success() || failure()
-        run: ./gradlew detekt
-
-      - name: Upload SARIF
-        uses: github/codeql-action/upload-sarif@v3
-        if: success() || failure()
-        with:
-          sarif_file: reports/detekt.sarif
-
-      - name: Run unit tests
-        if: success() || failure()
-        run: ./gradlew testDebug
-
-      - name: Upload Test Reports
-        id: uploadTestReports
-        if: success() || failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-reports
-          path: '**/build/reports/tests/'
-
-      - name: Decode Keystore
-        env:
-          ENCODED_STRING: ${{ secrets.ANDROID_KEYSTORE }}
-          KEYSTORE_FILE: ${{ secrets.KEYSTORE_FILE }}
-
-        run: |
-          echo $ENCODED_STRING > keystore-b64.txt
-          base64 -d keystore-b64.txt > $KEYSTORE_FILE
-
-      - name: Build Release apk
-        env:
-          KEYSTORE_FILE: ${{ secrets.KEYSTORE_FILE }}
-          SIGNING_KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-          SIGNING_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-          SIGNING_STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-        run: ./gradlew assembleRelease
-
-      - name: Upload apk
-        id: uploadApk
-        uses: actions/upload-artifact@v4
-        with:
-          name: build
-          if-no-files-found: error
-          path: app/build/outputs/apk/release/app-release.apk
-
-      - name: Comment artifacts url
-        if: success() || failure()
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh pr comment ${{ github.event.number }} --body "
-          Lint report: ${{ steps.uploadLintReports.outputs.artifact-url }}
-          Unit tests report: ${{ steps.uploadTestReports.outputs.artifact-url }}
-          Apk: ${{ steps.uploadApk.outputs.artifact-url }}
-          "
 
         #          defaults:
         #            run:
         #              shell: bash
         #    working-directory: ./scripts
-        
+
 
         #env:
         #  DAY_OF_WEEK: Monday
