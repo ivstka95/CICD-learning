@@ -1,5 +1,4 @@
-name: Verify code, provide apk
-run-name: Verify code, provide apk for ${{ github.event.pull_request.title }}
+name: Dependency check
 
 on:
   schedule:
@@ -15,6 +14,7 @@ concurrency:
 
 jobs:
   checkDependencies:
+    permissions: write-all
     name: Check dependencies for vulnerabilities
     runs-on: ubuntu-latest
 
@@ -56,10 +56,3 @@ jobs:
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: 'build/reports/dependency-check-report.sarif'
-
-      - name: Comment artifacts url
-        if: success() || failure()
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh pr comment ${{ github.event.number }} --body "Dependency check report: ${{ steps.uploadDependencyCheckReport.outputs.artifact-url }}"
